@@ -1,8 +1,0 @@
-name        = "ns2siege+"
-source_dir  = "source"
-output_dir  = "output"
-description = [=[ns2siege+]=]
-image       = "preview.jpg"
-tag_modtype = "Custom Game Mode"
-tag_support = "Must be run on Server"
-publish_id = "281236ae"
