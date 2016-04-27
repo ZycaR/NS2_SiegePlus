@@ -7,6 +7,9 @@
     <filename>sg_Client.lua</filename>
   </file>
   <file>
+    <filename>sg_DamageMixin.lua</filename>
+  </file>
+  <file>
     <filename>sg_Filehook.lua</filename>
   </file>
   <file>

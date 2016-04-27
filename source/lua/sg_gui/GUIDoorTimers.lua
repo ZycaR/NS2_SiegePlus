@@ -49,13 +49,6 @@ function GUIDoorTimers:SetIsVisible(visible)
     //Shared.Message(debug.traceback())
 end
 
-local function GetGameInfoEntity()
-    local entityList = Shared.GetEntitiesWithClassname("GameInfo")
-    if entityList:GetSize() > 0 then    
-        return entityList:GetEntityAtIndex(0)
-    end
-end
-
 local function FormatTimer(time)
     if time > 0 then
         local minutes = math.floor( time / 60 )

@@ -24,17 +24,13 @@ if Server then
     
 end
 
-if Client then
+function GameInfo:GetSiegeTimes()
+    local gameLength = ConditionalValue(self:GetGameStarted(), Shared.GetTime() - self:GetStartTime(), 0)
+    local frontDoorTime = Clamp(self.FrontDoorTime - gameLength, 0, self.FrontDoorTime)
+    local siegeDoorTime = Clamp(self.SiegeDoorTime - gameLength, 0, self.SiegeDoorTime)
+    local suddenDeathTime = Clamp(self.SuddenDeathTime - gameLength, 0, self.SuddenDeathTime)
 
-    function GameInfo:GetSiegeTimes()
-        local gameLength = ConditionalValue(self:GetGameStarted(), Shared.GetTime() - self:GetStartTime(), 0)
-        local frontDoorTime = Clamp(self.FrontDoorTime - gameLength, 0, self.FrontDoorTime)
-        local siegeDoorTime = Clamp(self.SiegeDoorTime - gameLength, 0, self.SiegeDoorTime)
-        local suddenDeathTime = Clamp(self.SuddenDeathTime - gameLength, 0, self.SuddenDeathTime)
-
-        return frontDoorTime, siegeDoorTime, suddenDeathTime, gameLength
-    end
-    
+    return frontDoorTime, siegeDoorTime, suddenDeathTime, gameLength
 end
 
 Shared.LinkClassToMap("GameInfo", GameInfo.kMapName, networkVarsExt)
