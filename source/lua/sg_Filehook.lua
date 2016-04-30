@@ -9,5 +9,8 @@ ModLoader.SetupFileHook( "lua/NS2Gamerules.lua", "lua/sg_NS2Gamerules.lua" , "po
 // Truce mode untill front/siege doors are closed
 ModLoader.SetupFileHook( "lua/DamageMixin.lua", "lua/sg_DamageMixin.lua" , "post" )
 
-// hook custom gui elements
+// Special dynamicaly generated obstacles for func_doors
+ModLoader.SetupFileHook( "lua/ObstacleMixin.lua", "lua/sg_ObstacleMixin.lua" , "post" )
+
+// Hook custom gui elements
 ModLoader.SetupFileHook( "lua/GUIWorldText.lua", "lua/sg_GUIScriptLoader.lua" , "post" )

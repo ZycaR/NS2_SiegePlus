@@ -31,6 +31,9 @@
     <filename>sg_NetworkMessages.lua</filename>
   </file>
   <file>
+    <filename>sg_ObstacleMixin.lua</filename>
+  </file>
+  <file>
     <filename>sg_Server.lua</filename>
   </file>
   <file>
