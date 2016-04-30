@@ -236,7 +236,7 @@ end
 
 function FuncDoor:GetScaledModelExtents()
     local min, max = self:GetModelExtents()
-    local extents = (min + max )* 0.25
+    local extents = max * 0.5
 
     if self.scale ~= nil then
         extents.x = extents.x * self.scale.x
