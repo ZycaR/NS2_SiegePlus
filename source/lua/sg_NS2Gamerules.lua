@@ -24,6 +24,26 @@ end
 
 if Server then
 
+    local function TestFrontDoorTime(client)
+        if Shared.GetCheatsEnabled() or Shared.GetDevMode() then 
+            local ns2gamerules = GetGamerules()
+            ns2gamerules:OpenFuncDoors(kFrontDoorType, NS2Gamerules.kFrontDoorSound)
+            ns2gamerules.frontDoors = true
+            Shared.Message("= Front Doors =")
+        end
+    end
+    Event.Hook("Console_frontdoor", TestFrontDoorTime)
+
+    local function TestSiegeDoorTime(client)
+        if Shared.GetCheatsEnabled() or Shared.GetDevMode() then 
+            local ns2gamerules = GetGamerules()
+            ns2gamerules:OpenFuncDoors(kSiegeDoorType, NS2Gamerules.kSiegeDoorSound)
+            ns2gamerules.siegeDoors = true
+            Shared.Message("= Siege Doors =")
+        end
+    end
+    Event.Hook("Console_siegedoor", TestSiegeDoorTime)
+
     function NS2Gamerules:OpenFuncDoors(doorType, soundEffectType)
  
         local siegeMessageType = kDoorTypeToSiegeMessage[doorType]

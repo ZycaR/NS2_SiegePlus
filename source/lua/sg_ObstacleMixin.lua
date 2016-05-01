@@ -3,10 +3,20 @@
 //	ZycaR (c) 2016
 //
 
+kFuncDoorMapName = "ns2siege_funcdoor"
+
+function ObstacleMixin:OnInitialized()
+    //self:AddToMesh()
+end
+
+function ObstacleMixin:OnPathingMeshInitialized()
+    //self:AddToMesh()
+end
+
 local ns2_GetPathingInfo = ObstacleMixin._GetPathingInfo
 function ObstacleMixin:_GetPathingInfo()
 
-    if self:GetMapName() ~= "ns2siege_funcdoor" or not self._modelCoords then
+    if self:GetMapName() ~= kFuncDoorMapName or not self._modelCoords then
         return ns2_GetPathingInfo(self)
     end
 

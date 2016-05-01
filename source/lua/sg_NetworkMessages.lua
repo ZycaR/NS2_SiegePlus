@@ -25,14 +25,6 @@ if Server then
             team:ForEachPlayer(SendToPlayer)
         end        
     end
-   
-    local function TestFrontDoorMessage(client)
-        local ns2gamerules = GetGamerules()
-        SendSiegeMessage(ns2gamerules.team1, kSiegeMessageTypes.FrontDoorOpened)
-        SendSiegeMessage(ns2gamerules.team2, kSiegeMessageTypes.FrontDoorOpened)
-    end
-    Event.Hook("Console_frontdoor", TestFrontDoorMessage)
-
 end
 
 if Client then

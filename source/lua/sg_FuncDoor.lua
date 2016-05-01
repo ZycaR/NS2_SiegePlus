@@ -23,6 +23,13 @@ AddMixinNetworkVars(ModelMixin, networkVars)
 AddMixinNetworkVars(ObstacleMixin, networkVars)
 
 // Entity defined properties:
+//      self.type
+//      self.model
+//      self.direction
+//      self.distance
+//      self.speed
+//      self.protection
+    
 // type         (0-FrontDoor; 1-SiegeDoor; ...)
 function FuncDoor:GetDoorType()     return self.type end
 // model        (models/props/eclipse/eclipse_wallmodse_02_door.model)
@@ -48,13 +55,6 @@ function FuncDoor:OnCreate()
     InitMixin(self, BaseModelMixin)
     InitMixin(self, ModelMixin)
     InitMixin(self, ObstacleMixin)
-    
-    // self.type
-    // self.model
-    // self.direction
-    // self.distance
-    // self.speed
-    // self.protection
 end
 
 function FuncDoor:OnInitialized()
@@ -149,7 +149,8 @@ if Server then
 
             local endPoint = ConditionalValue(distance > delta:GetLength(), startPoint + delta, self.dstPosition)
             self:SetOrigin(endPoint)
-            
+
+            self:RemoveFromMesh()
             self:SyncPhysicsModel()
         else
             // delete all nearby cysts (cut cyst path)
@@ -224,7 +225,6 @@ function FuncDoor:OnAdjustModelCoords(modelCoords)
 end
 
 function FuncDoor:SyncPhysicsModel()
-
     local physModel = self:GetPhysicsModel()
     if physModel then
         local coords = self:OnAdjustModelCoords(self:GetCoords())
