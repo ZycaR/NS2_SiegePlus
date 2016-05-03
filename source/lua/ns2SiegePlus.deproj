@@ -25,9 +25,6 @@
     <filename>sg_NS2Gamerules.lua</filename>
   </file>
   <file>
-    <filename>sg_NS2Utility.lua</filename>
-  </file>
-  <file>
     <filename>sg_NetworkMessages.lua</filename>
   </file>
   <file>
@@ -38,5 +35,8 @@
   </file>
   <file>
     <filename>sg_Shared.lua</filename>
+  </file>
+  <file>
+    <filename>sg_TechTree_Server.lua</filename>
   </file>
 </project>

@@ -45,6 +45,10 @@ if Server then
     Event.Hook("Console_siegedoor", TestSiegeDoorTime)
 
     function NS2Gamerules:OpenFuncDoors(doorType, soundEffectType)
+
+        // update tech tree for playing team to allow forcefully disabled tech
+        self.team1:GetTechTree():SetTechChanged()
+        self.team2:GetTechTree():SetTechChanged()
  
         local siegeMessageType = kDoorTypeToSiegeMessage[doorType]
         SendSiegeMessage(self.team1, siegeMessageType)

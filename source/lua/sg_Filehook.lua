@@ -14,3 +14,6 @@ ModLoader.SetupFileHook( "lua/ObstacleMixin.lua", "lua/sg_ObstacleMixin.lua" , "
 
 // Hook custom gui elements
 ModLoader.SetupFileHook( "lua/GUIWorldText.lua", "lua/sg_GUIScriptLoader.lua" , "post" )
+
+// tech tree changes according doors
+ModLoader.SetupFileHook( "lua/TechTree_Server.lua", "lua/sg_TechTree_Server.lua" , "post" )
