@@ -28,7 +28,6 @@ AddMixinNetworkVars(ObstacleMixin, networkVars)
 //      self.direction
 //      self.distance
 //      self.speed
-//      self.protection
     
 // type         (0-FrontDoor; 1-SiegeDoor; ...)
 function FuncDoor:GetDoorType()     return self.type end
@@ -78,7 +77,6 @@ function FuncDoor:OnInitialized()
         self.srcPosition = Vector(self:GetOrigin())
         self.srcRotation = Angles(self:GetAngles())
         self.dstPosition, self.momentum = FindDestination(self)
-        self.protection = Clamp(self.protection, 0, 15)
 
     elseif Client then
         self.outline = false
@@ -152,11 +150,6 @@ if Server then
 
             self:RemoveFromMesh()
             self:SyncPhysicsModel()
-        else
-            // delete all nearby cysts (cut cyst path)
-            for _, cysts in ipairs(GetEntitiesForTeamWithinRange("Cyst", 2, self:GetOrigin(), self.protection)) do
-                DestroyEntity(cysts)
-            end 
         end
     end
     

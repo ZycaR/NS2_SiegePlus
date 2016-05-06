@@ -12,6 +12,7 @@ elseif Predict then
 end
 
 Script.Load("lua/sg_FuncDoor.lua")
+Script.Load("lua/sg_FuncMaid.lua")
 Script.Load("lua/sg_NetworkMessages.lua")
 
 kFrontDoorType = 0

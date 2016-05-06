@@ -12,6 +12,9 @@ ModLoader.SetupFileHook( "lua/DamageMixin.lua", "lua/sg_DamageMixin.lua" , "post
 // Special dynamicaly generated obstacles for func_doors
 ModLoader.SetupFileHook( "lua/ObstacleMixin.lua", "lua/sg_ObstacleMixin.lua" , "post" )
 
+// Cyst placement will emit signal for all func_maid entites on map ( in range of 1000 )
+ModLoader.SetupFileHook( "lua/Cyst.lua", "lua/sg_Cyst.lua" , "post" )
+
 // Hook custom gui elements
 ModLoader.SetupFileHook( "lua/GUIWorldText.lua", "lua/sg_GUIScriptLoader.lua" , "post" )
 

@@ -18,8 +18,8 @@
             <choice label="FrontDoor" value="0"/>
             <choice label="SiegeDoor" value="1"/>
         </parameter>
-        <parameter name="scale" type="vector" label="scale" default="1.0, 1.0, 1.0"/>
-		<parameter name="model" type="file" label="model" default="models/props/eclipse/eclipse_wallmodse_02_door.model" filter="*.model"/>
+        <parameter name="scale" type="vector" label="Scale" default="1.0, 1.0, 1.0"/>
+		<parameter name="model" type="file" label="Model" default="models/props/eclipse/eclipse_wallmodse_02_door.model" filter="*.model"/>
 		<parameter name="distance" type="real" label="Move Distance" help="How far the sg_func_door will move." default="10.0"/>
 		<parameter name="speed" type="real" label="Move Speed" help="How fast the sg_func_door will move." default="3.0"/>
         <parameter name="direction" type="choice" label="Direction" default="0"
@@ -30,9 +30,27 @@
 			<choice label="Right" value="3"/>
 			<choice label="WayPoint" value="4"/>
         </parameter>
-        <parameter name="protection" type="distance" default="12" label="Protection Radius"
-                   help="The cysts will not spawn in protection radius before doors are opened (prevent cysting marine side)."/>
+		<parameter name="protection" type="distance" default="1.0" label="Protection Radius" help="Reserved for further use."/>
 	</class>
+	
+    <class name="ns2siege_funcmaid">
+        <model>
+            <file>models/system/editor/funcmaid.model</file>
+            <scale>scale</scale>
+        </model>
+		<size>
+            <scale>scale</scale>
+        </size>
+		
+        <parameter name="scale" type="vector" label="Scale" default="1.0, 1.0, 1.0" help=""/>        
+        <parameter name="name" label="Name" type="string" help="Name of maid trigger which can be referenced by other entities." />
+		<parameter name="type" type="choice" label="TimerType" default="0"
+                   help="The func_maid will stop killing entering entities when selected timer expires.">
+            <choice label="Front Door Opening Time" value="0"/>
+            <choice label="Siege Door Opening Time" value="1"/>
+            <choice label="Sudden Death Time" value="2"/>
+        </parameter>
+    </class>	
 	<!-- end ns2siege+ -->
     
     <!-- Ambient sound -->    
