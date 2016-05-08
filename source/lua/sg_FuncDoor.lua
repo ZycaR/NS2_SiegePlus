@@ -23,34 +23,72 @@ AddMixinNetworkVars(ModelMixin, networkVars)
 AddMixinNetworkVars(ObstacleMixin, networkVars)
 
 // Entity defined properties:
-//      self.type
-//      self.model
-//      self.direction
-//      self.distance
-//      self.speed
-    
-// type         (0-FrontDoor; 1-SiegeDoor; ...)
-function FuncDoor:GetDoorType()     return self.type end
-// model        (models/props/eclipse/eclipse_wallmodse_02_door.model)
-function FuncDoor:GetModel()        return self.model end
-// direction    (0-Up; 1-Down; 2-Left; 3-Right)
-function FuncDoor:GetDirection()    return self.direction end
-// distance     (10)
-function FuncDoor:GetDistance()     return self.distance end
-// speed        (0.25)
-function FuncDoor:GetSpeed()        return self.speed end
+//   type         (0-FrontDoor; 1-SiegeDoor; ...)
+//   model        (models/props/eclipse/eclipse_wallmodse_02_door.model)
+//   direction    (0-Up; 1-Down; 2-Left; 3-Right)
+//   distance     (10)
+//   speed        (0.25)
+
 // is opened or is actually opening
 function FuncDoor:GetIsOpened()     return self.isOpened or self.isMoving end
 
-local function FindDestination(self)
-    local destination = self:GetDestination()
-    local direction = destination - self.srcPosition
-    return destination, GetNormalizedVector(direction) * self:GetSpeed()
+local function GetOpenTranslation(self)
+    local offset = self.waypoint.close.rotation:GetCoords()
+
+    if self.direction == 0 then       // Up
+        offset =   offset.yAxis
+    elseif self.direction == 1 then   // Down
+        offset = - offset.yAxis
+    elseif self.direction == 2 then   // Left
+        offset =   offset.xAxis
+    elseif self.direction == 3 then   // Right
+        offset = - offset.xAxis
+    elseif self.direction == 4 then   // Front
+        offset = - offset.zAxis
+    elseif self.direction == 5 then   // Back
+        offset =   offset.zAxis
+    end
+
+    return GetNormalizedVector(offset) * self.distance
+end
+
+local function InitDoorWaypoints(self)
+    self.waypoint = { }
+
+    self.waypoint.close = {
+        position = Vector(self:GetOrigin()),
+        rotation = Angles(self:GetAngles())
+    }
+    
+    local transform = GetOpenTranslation(self)
+    self.waypoint.open = {
+        position = self.waypoint.close.position + transform,
+        rotation = self.waypoint.close.rotation
+    }
+    self.waypoint.momentum = GetNormalizedVector(transform) * self.speed
+    
+    // set model to properly recalulate obstacle coordinates
+    self:SetOrigin(self.waypoint.close.position)    
+    self:SetAngles(self.waypoint.close.rotation)
+    self.waypoint.obstacle = {
+        origin = Vector(self:GetModelOrigin()),
+        radius = self:GetScaledModelExtents():GetLengthXZ()
+    }
+end
+
+local function DrawDebugBox(self, lifetime)
+    if Shared.GetCheatsEnabled() or Shared.GetDevMode() then 
+        local obstacle = self.waypoint.obstacle
+        local size = obstacle.radius
+        local min = obstacle.origin + Vector(-size,-size,-size)
+        local max = obstacle.origin + Vector( size, size, size)
+        DebugBox(min, max, Vector(0,0,0), lifetime, 1, 0, 0, 1)
+    end
 end
 
 function FuncDoor:OnCreate()
     ScriptActor.OnCreate(self)
-    
+
     InitMixin(self, BaseModelMixin)
     InitMixin(self, ModelMixin)
     InitMixin(self, ObstacleMixin)
@@ -71,24 +109,14 @@ function FuncDoor:OnInitialized()
             Shared.Message("Missing or invalid func_door model")
         end
 
-        self.isOpened = false
-        self.isMoving = false
+        // init with closed door position
+        InitDoorWaypoints(self)
         
-        self.srcPosition = Vector(self:GetOrigin())
-        self.srcRotation = Angles(self:GetAngles())
-        self.dstPosition, self.momentum = FindDestination(self)
+        self:SetIsOpened(false)
+        self.closeWhenGameStarts = false
 
     elseif Client then
         self.outline = false
-    end
-end
-
-local function DrawDebugBox(self, lifetime)
-    if Shared.GetCheatsEnabled() or Shared.GetDevMode() then 
-        local size = self:GetObstacleRadius()
-        local min = self:GetModelOrigin() + Vector(-size,-size,-size)
-        local max = self:GetModelOrigin() + Vector( size, size, size)
-        DebugBox(min, max, Vector(0,0,0), lifetime, 1, 0, 0, 1)
     end
 end
 
@@ -96,19 +124,68 @@ function FuncDoor:Reset()
     ScriptActor.Reset(self)
 
     if Server then
-        self.isOpened = false
-        self.isMoving = false
-        self:SetAngles(self.srcRotation)
-        self:SetOrigin(self.srcPosition)
-        self.dstPosition, self.momentum = FindDestination(self)
-        self:SyncPhysicsModel()
-        
-        self:RemoveFromMesh()
-        self:SyncToObstacleMesh()
-        
+        self:SetIsOpened(true)
+        self.closeWhenGameStarts = true
+
         DrawDebugBox(self, 100)
     end
 
+end
+
+function FuncDoor:OnAdjustModelCoords(modelCoords)
+    local coords = modelCoords
+    if self.scale and self.scale:GetLength() ~= 0 then
+        coords.xAxis = coords.xAxis * self.scale.x
+        coords.yAxis = coords.yAxis * self.scale.y
+        coords.zAxis = coords.zAxis * self.scale.z
+    end
+    return coords
+end
+
+function FuncDoor:GetScaledModelExtents()
+    local min, max = self:GetModelExtents()
+    local extents = max * 0.5
+
+    if self.scale ~= nil then
+        extents.x = extents.x * self.scale.x
+        extents.y = extents.y * self.scale.y
+        extents.z = extents.z * self.scale.z    
+    end
+    
+    return extents
+end
+
+function FuncDoor:SyncPhysicsModel()
+    local physModel = self:GetPhysicsModel()
+    if physModel then
+        local coords = self:OnAdjustModelCoords(self:GetCoords())
+        coords.origin = self:GetOrigin()
+        physModel:SetCoords(coords)
+        physModel:SetBoneCoords(coords, CoordsArray())
+    end    
+end
+
+function FuncDoor:GetObstaclePathingInfo()
+    if Server then
+        local centerpoint = self.waypoint.obstacle.origin + Vector(0, -100, 0)
+        local radius = Clamp(self.waypoint.obstacle.radius, 1.5, 24.0)
+        return centerpoint, radius, 1000.0
+    else
+        local centerpoint = self:GetModelOrigin() + Vector(0, -100, 0)
+        local radius = Clamp(self:GetScaledModelExtents():GetLengthXZ(), 1.5, 24.0)
+        return centerpoint, radius, 1000.0
+    end
+end
+
+// add or remove from pathing mesh
+function FuncDoor:SyncToObstacleMesh() 
+	if not self:GetIsOpened() and self.obstacleId == -1 then
+        self:AddToMesh()
+    end
+    
+    if self:GetIsOpened() and self.obstacleId ~= -1 then
+        self:RemoveFromMesh()
+    end
 end
 
 function FuncDoor:OnUpdate(deltaTime)
@@ -123,51 +200,73 @@ end
 
 if Server then 
    
-    function FuncDoor:BeginOpenDoor(doorType)
-        if self.type == doorType then
-            self.isMoving = true
+    function FuncDoor:SetIsOpened(state)
+        local open = ( state ~= false )
+        if self.isOpened ~= open then
+            //Shared.Message("FuncDoor .. " ..  ConditionalValue(open, "opened", "closed") )
+
+            self.isOpened = open
+            self.isMoving = false
+
+            // force translate door model to source or destination position
+            local waypoint = ConditionalValue(self.isOpened, self.waypoint.open, self.waypoint.close)
+            self:SetAngles(waypoint.rotation)
+            self:SetOrigin(waypoint.position)
+            self:SyncPhysicsModel()
+
+            // remove from pathing mesh
+            self:SyncToObstacleMesh()
         end
     end
     
-    function FuncDoor:OnUpdatePosition(deltaTime) 
-        if self.isOpened then
+    function FuncDoor:BeginOpenDoor(doorType)
+        if self.type == doorType and not self.isOpened then
+            self.isMoving = true
+        end
+    end
+
+    // func_doors counts the 'Countdown', 'Draw' and both 'Win' states as running game
+    local function GetGameStartedForFuncDoor()
+        local state = GetGamerules():GetGameState()
+        return state ~= kGameState.NotStarted and
+               state ~= kGameState.PreGame 
+    end
+
+    function FuncDoor:OnUpdatePosition(deltaTime)
+        // don't update position until game is not started
+        if not GetGameStartedForFuncDoor() then 
+            return
+        end        
+
+        // close door after game started
+        if self.closeWhenGameStarts then
+            // Shared.Message("FuncDoor .. closing!")
+            self:SetIsOpened(false)
+            self.closeWhenGameStarts = false
             return
         end
-        if self.isMoving then 
+
+        if not self.isOpened and self.isMoving then 
             // UpdatePosition by delta time
             local startPoint = Vector(self:GetOrigin())
-            local distance = (self.dstPosition - startPoint):GetLength()
-            local delta = deltaTime * self.momentum
+            local endPoint = self.waypoint.open.position
+            local distance = (endPoint - startPoint):GetLength()
+            local delta = deltaTime * self.waypoint.momentum
 
             // check, whether doors are already opened
             if distance <= FuncDoor.kOpenDelta then
                 self.isOpened = true
+                self.isMoving = false
                 return
             end
 
-            local endPoint = ConditionalValue(distance > delta:GetLength(), startPoint + delta, self.dstPosition)
-            self:SetOrigin(endPoint)
+            local position = ConditionalValue(distance > delta:GetLength(), startPoint + delta, endPoint)
+            self:SetOrigin(position)
 
             self:RemoveFromMesh()
             self:SyncPhysicsModel()
         end
     end
-    
-    function FuncDoor:GetDestination() 
-        local dst = self:GetOrigin()
-
-        if self:GetDirection() == 0 then       // Up
-            dst = dst + Vector(0,  self:GetDistance(), 0)
-        elseif self:GetDirection() == 1 then   // Down
-            dst = dst + Vector(0, -self:GetDistance(), 0)
-        elseif self:GetDirection() == 2 then   // Left
-            dst = dst + Vector( self:GetDistance(), 0, 0)
-        elseif self:GetDirection() == 3 then   // Right
-            dst = dst + Vector(-self:GetDistance(), 0, 0)
-        end
-
-        return dst
-    end     
 end
 
 if Client then
@@ -189,8 +288,10 @@ if Client then
     function FuncDoor:OnUpdateOutline()
         local player = Client.GetLocalPlayer()
         local model = self:GetRenderModel()
-        local outline = not self:GetIsOpened()
         
+        // draw outline for closed door or when game is not started 
+        local outline = not self:GetIsOpened() or not player:GetGameStarted()
+
         if model ~= nil and outline ~= self.outline then
             self.outline = outline
             
@@ -205,58 +306,6 @@ if Client then
         end
     end
 
-end
-
-function FuncDoor:OnAdjustModelCoords(modelCoords)
-    local coords = modelCoords
-    if self.scale and self.scale:GetLength() ~= 0 then
-        coords.xAxis = coords.xAxis * self.scale.x
-        coords.yAxis = coords.yAxis * self.scale.y
-        coords.zAxis = coords.zAxis * self.scale.z
-    end
-    return coords
-end
-
-function FuncDoor:SyncPhysicsModel()
-    local physModel = self:GetPhysicsModel()
-    if physModel then
-        local coords = self:OnAdjustModelCoords(self:GetCoords())
-        coords.origin = self:GetOrigin()
-        physModel:SetCoords(coords)
-        physModel:SetBoneCoords(coords, CoordsArray())
-    end    
-end
-
-function FuncDoor:GetScaledModelExtents()
-    local min, max = self:GetModelExtents()
-    local extents = max * 0.5
-
-    if self.scale ~= nil then
-        extents.x = extents.x * self.scale.x
-        extents.y = extents.y * self.scale.y
-        extents.z = extents.z * self.scale.z    
-    end
-    
-    return extents
-end
-
-function FuncDoor:GetObstacleCenterPoint()
-    return self:GetModelOrigin()
-end
-
-function FuncDoor:GetObstacleRadius()
-    return self:GetScaledModelExtents():GetLengthXZ()
-end
-
-// add or remove from pathing mesh
-function FuncDoor:SyncToObstacleMesh() 
-	if not self:GetIsOpened() and self.obstacleId == -1 then
-        self:AddToMesh()
-    end
-    
-    if self:GetIsOpened() and self.obstacleId ~= -1 then
-        self:RemoveFromMesh()
-    end
 end
 
 Shared.LinkClassToMap("FuncDoor", FuncDoor.kMapName, networkVars)

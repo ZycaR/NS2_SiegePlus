@@ -28,7 +28,8 @@
             <choice label="Down" value="1"/>
             <choice label="Left" value="2"/>
 			<choice label="Right" value="3"/>
-			<choice label="WayPoint" value="4"/>
+			<choice label="Front" value="4"/>
+			<choice label="Back" value="5"/>
         </parameter>
 		<parameter name="protection" type="distance" default="1.0" label="Protection Radius" help="Reserved for further use."/>
 	</class>

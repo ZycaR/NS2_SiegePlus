@@ -20,7 +20,6 @@ function ObstacleMixin:_GetPathingInfo()
         return ns2_GetPathingInfo(self)
     end
 
-    local centerpoint = self:GetModelOrigin() + Vector(0, -100, 0)
-    local radius = Clamp(self:GetScaledModelExtents():GetLengthXZ(), 1.5, 24.0)
-    return centerpoint, radius, 1000.0
+    assert(self.GetObstaclePathingInfo)
+    return self:GetObstaclePathingInfo()
 end
