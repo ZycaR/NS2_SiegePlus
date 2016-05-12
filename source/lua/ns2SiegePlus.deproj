@@ -7,6 +7,12 @@
     <filename>sg_Client.lua</filename>
   </file>
   <file>
+    <filename>sg_CommandStation.lua</filename>
+  </file>
+  <file>
+    <filename>sg_CommandStructure.lua</filename>
+  </file>
+  <file>
     <filename>sg_Cyst.lua</filename>
   </file>
   <file>

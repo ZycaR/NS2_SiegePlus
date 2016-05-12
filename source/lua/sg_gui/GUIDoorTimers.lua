@@ -6,7 +6,7 @@
 class 'GUIDoorTimers' (GUIScript)
 
 // half of screen & one row
-GUIDoorTimers.kBackgroundScale = Vector(460, 32, 0)
+GUIDoorTimers.kBackgroundScale = Vector(460, 26, 0)
 GUIDoorTimers.kDoorTimersFontName = Fonts.kArial_17 
 
 function GUIDoorTimers:OnResolutionChanged(oldX, oldY, newX, newY)
@@ -20,7 +20,7 @@ function GUIDoorTimers:Initialize()
     self.background = GUIManager:CreateGraphicItem()
     self.background:SetSize(backgroundSize)
     self.background:SetAnchor(GUIItem.Middle, GUIItem.Top)
-    self.background:SetPosition( Vector( -backgroundSize.x / 2, GUIScale(10), 0) )
+    self.background:SetPosition( Vector( -backgroundSize.x / 2, GUIScale(3), 0) )
     self.background:SetIsVisible(false)
     self.background:SetColor(Color(0,0,0,0.5))
     self.background:SetLayer(kGUILayerLocationText)
@@ -49,13 +49,13 @@ function GUIDoorTimers:SetIsVisible(visible)
     //Shared.Message(debug.traceback())
 end
 
-local function FormatTimer(time)
+local function FormatTimer(time, default)
     if time > 0 then
         local minutes = math.floor( time / 60 )
         local seconds = math.floor( time - minutes * 60 ) 
         return string.format("%d:%02d", minutes, seconds) 
     end
-    return "OPEN"
+    return default
 end
 
 function GUIDoorTimers:Update(deltaTime)
@@ -66,9 +66,11 @@ function GUIDoorTimers:Update(deltaTime)
     if PlayerUI_GetHasGameStarted() and (gameTime > 0) then
         local front, siege, suddendeath = GetGameInfoEntity():GetSiegeTimes()
         if front > 0 or siege > 0 then
-            text = string.format("Front Door: %s | Siege Door: %s", FormatTimer(front), FormatTimer(siege))
+            text = string.format("Front Door: %s | Siege Door: %s", 
+                FormatTimer(front, "OPEN"), FormatTimer(siege, "OPEN"))
         else
-            text = string.format("Sudden Death in: %s", FormatTimer(suddendeath))
+            text = string.format("Sudden Death: %s",
+                FormatTimer(suddendeath, "ACTIVATED"))
         end
         self.timers:SetText(text) 
         visible = true

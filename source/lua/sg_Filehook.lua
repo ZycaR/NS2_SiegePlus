@@ -9,6 +9,10 @@ ModLoader.SetupFileHook( "lua/NS2Gamerules.lua", "lua/sg_NS2Gamerules.lua" , "po
 // Truce mode untill front/siege doors are closed
 ModLoader.SetupFileHook( "lua/DamageMixin.lua", "lua/sg_DamageMixin.lua" , "post" )
 
+// Sudden death mode disable repair of CommandStation and heal Hive
+ModLoader.SetupFileHook( "lua/CommandStation.lua", "lua/sg_CommandStation.lua" , "post" )
+ModLoader.SetupFileHook( "lua/CommandStructure.lua", "lua/sg_CommandStructure.lua" , "post" )
+
 // Special dynamicaly generated obstacles for func_doors
 ModLoader.SetupFileHook( "lua/ObstacleMixin.lua", "lua/sg_ObstacleMixin.lua" , "post" )
 

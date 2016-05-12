@@ -5,6 +5,7 @@
 
 NS2Gamerules.kFrontDoorSound = PrecacheAsset("sound/siegeroom.fev/door/frontdoor")
 NS2Gamerules.kSiegeDoorSound = PrecacheAsset("sound/siegeroom.fev/door/siege")
+NS2Gamerules.kSuddenDeathSound = PrecacheAsset("sound/siegeroom.fev/door/SD")
 
 function NS2Gamerules:GetFrontDoorsOpen()
     local gameLength = Shared.GetTime() - self:GetGameStartTime()
@@ -44,6 +45,16 @@ if Server then
     end
     Event.Hook("Console_siegedoor", TestSiegeDoorTime)
 
+    local function TestSuddenDeathTime(client)
+        if Shared.GetCheatsEnabled() or Shared.GetDevMode() then 
+            local ns2gamerules = GetGamerules()
+            ns2gamerules:ActivateSuddenDeath()
+            ns2gamerules.suddenDeath = true
+            Shared.Message("= Sudden Death =")
+        end
+    end
+    Event.Hook("Console_suddendeath", TestSuddenDeathTime)
+
     function NS2Gamerules:OpenFuncDoors(doorType, soundEffectType)
 
         // update tech tree for playing team to allow forcefully disabled tech
@@ -58,15 +69,27 @@ if Server then
             door:BeginOpenDoor(doorType)
         end
 
-        local siegeSoundType = kDoorTypeToSiegeMessage[doorType]
         for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
             if player:GetIsOnPlayingTeam() then
-                //Shared.Message('effect ..')
                 StartSoundEffectForPlayer(soundEffectType, player)
             end
         end
 
     end
+    
+    function NS2Gamerules:ActivateSuddenDeath()
+        local siegeMessageType = kSiegeMessageTypes.SuddenDeathActivated
+        SendSiegeMessage(self.team1, siegeMessageType)
+        SendSiegeMessage(self.team2, siegeMessageType)
+
+        local soundEffectType = NS2Gamerules.kSuddenDeathSound
+        for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+            if player:GetIsOnPlayingTeam() then
+                StartSoundEffectForPlayer(soundEffectType, player)
+            end
+        end
+
+    end    
     
     // Update doors status (techpoints are close enough method)
     local ns2_UpdateTechPoints = NS2Gamerules.UpdateTechPoints
@@ -82,6 +105,11 @@ if Server then
             self:OpenFuncDoors(kSiegeDoorType, NS2Gamerules.kSiegeDoorSound)
             self.siegeDoors = true
         end
+        
+        if not self.suddenDeath and self:GetSuddenDeathActivated() then
+            self:ActivateSuddenDeath()
+            self.suddenDeath = true
+        end        
     end
 
     // Reset door status
@@ -91,6 +119,7 @@ if Server then
 
         self.frontDoors = false
         self.siegeDoors = false
+        self.suddenDeath = false
     end
 
 end

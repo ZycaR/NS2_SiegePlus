@@ -4,6 +4,7 @@
 //
 Script.Load("lua/ScriptActor.lua")
 Script.Load("lua/ObstacleMixin.lua")
+Script.Load("lua/MapBlipMixin.lua")
 
 class 'FuncDoor' (ScriptActor)
 FuncDoor.kMapName = "ns2siege_funcdoor"
@@ -15,7 +16,8 @@ local networkVars =
 {
     scale = "vector",
     isOpened = "boolean",
-    isMoving = "boolean"
+    isMoving = "boolean",
+    mapblip = "vector"
 }
 
 AddMixinNetworkVars(BaseModelMixin, networkVars)
@@ -88,10 +90,12 @@ end
 
 function FuncDoor:OnCreate()
     ScriptActor.OnCreate(self)
+    self.mapblip = Vector(self:GetOrigin())
 
     InitMixin(self, BaseModelMixin)
     InitMixin(self, ModelMixin)
     InitMixin(self, ObstacleMixin)
+   
 end
 
 function FuncDoor:OnInitialized()
@@ -105,6 +109,11 @@ function FuncDoor:OnInitialized()
 
             self:SetPhysicsType(PhysicsType.Kinematic)
             self:SetPhysicsGroup(PhysicsGroup.BigStructuresGroup)
+            
+            -- This Mixin must be inited inside this OnInitialized() function.
+            if not HasMixin(self, "MapBlip") then
+                InitMixin(self, MapBlipMixin)
+            end
        else
             Shared.Message("Missing or invalid func_door model")
         end
@@ -114,6 +123,7 @@ function FuncDoor:OnInitialized()
         
         self:SetIsOpened(false)
         self.closeWhenGameStarts = false
+        self.mapblip = Vector(self:GetModelOrigin())
 
     elseif Client then
         self.outline = false
@@ -306,6 +316,21 @@ if Client then
         end
     end
 
+end
+
+// minimap support
+function FuncDoor:OnGetMapBlipInfo()
+    local success = true
+    local blipType = kMinimapBlipType.EtherealGate
+    local blipTeam = -1
+    local isAttacked = false
+    local isParasited = false
+    
+    return success, blipType, blipTeam, isAttacked, isParasited
+end
+
+function FuncDoor:GetPositionForMinimap()
+    return self.mapblip
 end
 
 Shared.LinkClassToMap("FuncDoor", FuncDoor.kMapName, networkVars)
