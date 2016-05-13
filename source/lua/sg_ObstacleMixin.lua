@@ -5,14 +5,6 @@
 
 kFuncDoorMapName = "ns2siege_funcdoor"
 
-function ObstacleMixin:OnInitialized()
-    //self:AddToMesh()
-end
-
-function ObstacleMixin:OnPathingMeshInitialized()
-    //self:AddToMesh()
-end
-
 local ns2_GetPathingInfo = ObstacleMixin._GetPathingInfo
 function ObstacleMixin:_GetPathingInfo()
 
