@@ -10,9 +10,9 @@ Winning conditions are same as NS2, kill all Hives or CC's. Also most of the gam
 Basically it's up to the aliens to go offensive and takeover the marine base before siege room opens.
 It's beautiful because both sides gets res, meaning full upgrades for both sides.
 
-# Mappers guide
+## Mappers guide
 
-## Basics
+### Basics
 
 Please take to an account these requirements before you start creating siege map.
 This is bare minimum what should acceptable siege map design satisfied:
@@ -21,7 +21,7 @@ This is bare minimum what should acceptable siege map design satisfied:
 - Marines have another set of doors in their base with give access to a Siege Room, where they can arc out the alien hives. This door opens after front doors.
 - So all three alien hives at tucked together for this reason. 
 
-## Siege+ specific map entities
+### Siege+ specific map entities
 The map for siege+ gameplay is very similar to original ns2 map. It requires same basic entities like ns2_gamerules, at least two tech. points, mini-map entity, etc.
 But there are basically three new additions in advance to allow siege+ gameplay:
 
@@ -51,3 +51,17 @@ Maid is the volume entity (locations) for killing cysts in it's volume. Usually 
 > **TimerType** .. The maid will stop killing placed cysts when selected timer expires.
 
 > *This property is a choice for all three times: Front door, Siege door or Sudden Death.*
+
+### Siege+ Map List
+
+* **sg_basic** .. small test map (not for public, only educational purpose)
+* **sg_trimsiege** .. fully finished and maintained siege+ map
+
+### Mod ID - 281236ae
+```sh
+Server.exe -mods "281236ae"
+```
+
+### SteamWorkshop link
+
+http://steamcommunity.com/sharedfiles/filedetails/?id=672282286
