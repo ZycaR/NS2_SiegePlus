@@ -27,20 +27,27 @@ But there are basically three new additions in advance to allow siege+ gameplay:
 
 ##### ns2_gamerules
 This is original ns2 entity which dictates gameplay rules. Three siege+ specific properties were added in advance:
-> **Front Door Opening Time** .. time since round start to open front doors in seconds.\
-> **Siege Door Opening Time** .. time since round start to open siege doors in seconds.\
+> **Front Door Opening Time** .. time since round start to open front doors in seconds.
+
+> **Siege Door Opening Time** .. time since round start to open siege doors in seconds.
+
 > **Sudden Death Time** .. time since round start when CommanStation and Hive cannot be repaired in seconds.
 
 ##### ns2siege_funcdoor
 Entity representing siege+ special doors entity. The times specified in ns2_gamerules entity are counting down time till these doors are opened. Mapper can configure door behaviour by these build in properties:
-> **Door Type** .. choice between Front or Siege type of door.\
-> **Model** .. select prop. which will be used as door model.\
-> **Direction** .. You can choose one of six directions the door will move when opening.\
-> **Move Distance** .. How far the door will be move when opening.\
+> **Door Type** .. choice between Front or Siege type of door.
+
+> **Model** .. select prop. which will be used as door model.
+
+> **Direction** .. You can choose one of six directions the door will move when opening.
+
+> **Move Distance** .. How far the door will be move when opening.
+
 > **Move Speed** .. How fast the door will move.
 
 ##### ns2siege_funcmaid
 Maid is the volume entity (locations) for killing cysts in it's volume. Usually it's located on marine side of front and siege doors to kill slipping cyst chain as prevention for exploits before specific door is opened. Mappers can place multiple instances for same door. This gives mappers full control over area which needs to be cleaned from cysts!
 
-> **TimerType** .. The maid will stop killing placed cysts when selected timer expires.\
-> This property is a choice for all three times: Front door, Siege door or Sudden Death.
+> **TimerType** .. The maid will stop killing placed cysts when selected timer expires.
+
+> *This property is a choice for all three times: Front door, Siege door or Sudden Death.*
