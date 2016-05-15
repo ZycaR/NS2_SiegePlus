@@ -10,7 +10,7 @@ function TechTree:SetTechNodeChanged(node, logMsg)
     if node:GetTechId() == kTechId.Contamination then
 
         local front, siege, suddendeath = GetGameInfoEntity():GetSiegeTimes()
-        if front > 0 or siege > 0 then
+        if front > 0 and siege > 0 then
             node.available = false
             return
         end

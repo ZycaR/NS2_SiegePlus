@@ -23,4 +23,5 @@ ModLoader.SetupFileHook( "lua/Cyst.lua", "lua/sg_Cyst.lua" , "post" )
 ModLoader.SetupFileHook( "lua/GUIWorldText.lua", "lua/sg_GUIScriptLoader.lua" , "post" )
 
 // tech tree changes according doors
+ModLoader.SetupFileHook( "lua/Balance.lua", "lua/sg_Balance.lua" , "post" )
 ModLoader.SetupFileHook( "lua/TechTree_Server.lua", "lua/sg_TechTree_Server.lua" , "post" )

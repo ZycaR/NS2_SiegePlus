@@ -15,10 +15,6 @@ Script.Load("lua/sg_FuncDoor.lua")
 Script.Load("lua/sg_FuncMaid.lua")
 Script.Load("lua/sg_NetworkMessages.lua")
 
-// increase contamination cooldown significanlty ... because siege is about turtling!
-kContaminationCooldown = 60
-kContaminationBileSpewCount = 1 
-
 kFrontDoorType = 0
 kSiegeDoorType = 1
 
