@@ -4,8 +4,6 @@
 //
 Script.Load("lua/Mixins/SignalEmitterMixin.lua")
 
-
-
 local ns2_OnInitialized = Cyst.OnInitialized
 function Cyst:OnInitialized()
     InitMixin(self, SignalEmitterMixin)
@@ -14,6 +12,6 @@ function Cyst:OnInitialized()
     
     if Server then
         self:SetSignalRange(1000)
-        self:EmitSignal(0, "func_maid_signal")
+        self:EmitSignal(0, kSignalFuncMaid)
     end
 end

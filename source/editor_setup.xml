@@ -32,6 +32,7 @@
 			<choice label="Back" value="5"/>
         </parameter>
 		<parameter name="protection" type="distance" default="1.0" label="Protection Radius" help="Reserved for further use."/>
+		<parameter name="emitMessage" type="string" label="Emit message" help="The listening entity must respond to this message." default="" />
 	</class>
 	
     <class name="ns2siege_funcmaid">
@@ -51,6 +52,7 @@
             <choice label="Siege Door Opening Time" value="1"/>
             <choice label="Sudden Death Time" value="2"/>
         </parameter>
+        <parameter name="listenMessage" type="string" label="Kill on message" help="Will kill all live entities when message is received." default="maid_kill"/>
     </class>	
 	<!-- end ns2siege+ -->
     

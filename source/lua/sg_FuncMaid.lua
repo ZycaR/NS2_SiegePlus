@@ -13,7 +13,7 @@ local networkVars = { }
 
 // copied from death_trigger, which should do it right
 local function KillEntity(self, entity)
-    if Server and HasMixin(entity, "Live") and entity:GetIsAlive() and entity:GetCanDie(true) then
+    if Server and HasMixin(entity, "Live") and entity:GetIsAlive() and entity:GetCanDie() then
         local direction = GetNormalizedVector(entity:GetModelOrigin() - self:GetOrigin())
         entity:Kill(self, self, self:GetOrigin(), direction)
     end
@@ -32,21 +32,39 @@ local function FuncMaidTriggered(self)
     end
 end
 
+local function KillAllInMaid(self)
+    local origin = self:GetOrigin()
+    local radius = (self.scale * 0.25):GetLength()
+    local hitEntities = GetEntitiesWithMixinWithinRange("Live", origin, radius)
+
+    for _, entity in ipairs(hitEntities) do
+        if self:GetIsPointInside(entity:GetOrigin()) then
+            Shared.Message('Maid\'s killing duty for .. ' .. entity:GetClassName())
+            KillEntity(self, entity) // do cleanup
+        end
+    end
+end
+
 function FuncMaid:OnCreate()
     Trigger.OnCreate(self)
-
     InitMixin(self, SignalListenerMixin)
-    self:RegisterSignalListener(function()
-        FuncMaidTriggered(self) 
-    end, "func_maid_signal")
-    
     self:SetPropagate(Entity.Propagate_Never)
+    self.listenMessage = self.listenMessage or "maid_kill"
 end
 
 function FuncMaid:OnInitialized()
     Trigger.OnInitialized(self)
     self:SetTriggerCollisionEnabled(true)
     self:SetUpdates(false)
+    
+    self:RegisterSignalListener(function()
+        FuncMaidTriggered(self)
+    end, kSignalFuncMaid)
+    
+    self:RegisterSignalListener(function()
+        KillAllInMaid(self)
+    end, self.listenMessage)
+
 end
 
 if Server then

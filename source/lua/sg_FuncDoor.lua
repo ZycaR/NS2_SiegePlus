@@ -5,6 +5,7 @@
 Script.Load("lua/ScriptActor.lua")
 Script.Load("lua/ObstacleMixin.lua")
 Script.Load("lua/MapBlipMixin.lua")
+Script.Load("lua/Mixins/SignalEmitterMixin.lua")
 
 class 'FuncDoor' (ScriptActor)
 FuncDoor.kMapName = "ns2siege_funcdoor"
@@ -95,14 +96,15 @@ function FuncDoor:OnCreate()
     InitMixin(self, BaseModelMixin)
     InitMixin(self, ModelMixin)
     InitMixin(self, ObstacleMixin)
+    InitMixin(self, SignalEmitterMixin)
    
+    self.emitMessage = ""
 end
 
 function FuncDoor:OnInitialized()
     ScriptActor.OnInitialized(self)  
-
+    
     if Server then
-
         if self.model ~= nil and GetFileExists(self.model) then
             Shared.PrecacheModel(self.model)
             self:SetModel(self.model)
@@ -114,7 +116,7 @@ function FuncDoor:OnInitialized()
             if not HasMixin(self, "MapBlip") then
                 InitMixin(self, MapBlipMixin)
             end
-       else
+        else
             Shared.Message("Missing or invalid func_door model")
         end
 
@@ -124,7 +126,7 @@ function FuncDoor:OnInitialized()
         self:SetIsOpened(false)
         self.closeWhenGameStarts = false
         self.mapblip = Vector(self:GetModelOrigin())
-
+        
     elseif Client then
         self.outline = false
     end
@@ -228,10 +230,15 @@ if Server then
             self:SyncToObstacleMesh()
         end
     end
-    
+
     function FuncDoor:BeginOpenDoor(doorType)
         if self.type == doorType and not self.isOpened then
             self.isMoving = true
+
+            if self.emitMessage ~= "" then
+                self:SetSignalRange(1000)
+                self:EmitSignal(0, self.emitMessage)
+            end
         end
     end
 
