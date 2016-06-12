@@ -245,8 +245,7 @@ if Server then
     // func_doors counts the 'Countdown', 'Draw' and both 'Win' states as running game
     local function GetGameStartedForFuncDoor()
         local state = GetGamerules():GetGameState()
-        return state ~= kGameState.NotStarted and
-               state ~= kGameState.PreGame 
+        return state > kGameState.PreGame 
     end
 
     function FuncDoor:OnUpdatePosition(deltaTime)
@@ -303,11 +302,10 @@ if Client then
     end
 
     function FuncDoor:OnUpdateOutline()
-        local player = Client.GetLocalPlayer()
         local model = self:GetRenderModel()
         
-        // draw outline for closed door or when game is not started 
-        local outline = not self:GetIsOpened() or not player:GetGameStarted()
+        // draw outline for closed door or when game is not started
+        local outline = not self:GetIsOpened() or (GetGameInfoEntity():GetState() <= kGameState.PreGame)
 
         if model ~= nil and outline ~= self.outline then
             self.outline = outline

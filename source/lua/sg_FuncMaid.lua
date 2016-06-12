@@ -13,6 +13,9 @@ local networkVars = { }
 
 // copied from death_trigger, which should do it right
 local function KillEntity(self, entity)
+    -- don't kill powerpoint
+    if entity:isa("PowerPoint") then return end
+
     if Server and HasMixin(entity, "Live") and entity:GetIsAlive() and entity:GetCanDie() then
         local direction = GetNormalizedVector(entity:GetModelOrigin() - self:GetOrigin())
         entity:Kill(self, self, self:GetOrigin(), direction)
